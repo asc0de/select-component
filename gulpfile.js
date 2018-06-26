@@ -24,9 +24,11 @@ gulp.task("prepare", ["clean"], function() {
         .pipe(flatten())
         .pipe(gulp.dest(distFolder));
 
-    gulp.src(["./dropdown/dropdown.css"])
+    gulp.src(["./dropdown/dropdown.css", "./dropdown/input/input.css"])
         .pipe(concat("dropdown.css"))
         .pipe(gulp.dest(distFolder));
+
+    gulp.src(["./dropdown/input/down-arrow.svg"]).pipe(gulp.dest(distFolder));
 });
 
 gulp.task("prepare:watch", function() {

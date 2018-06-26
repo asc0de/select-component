@@ -1,9 +1,12 @@
 function Input(parent, placeholder) {
     ChildElement.call(this, parent);
     this.placeholder = placeholder || "";
+
     this.createElement = function() {
-        this.element = document.createElement("INPUT");
-        this.element.placeholder = this.placeholder;
+        var input = document.createElement("INPUT");
+        input.placeholder = this.placeholder;
+        this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown__input");
+        this.element.appendChild(input);
     };
 }
