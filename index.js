@@ -1,4 +1,2 @@
-import VkDropdown from "./dropdown/dropdown";
-
-new VkDropdown({ element: document.getElementById("test1") });
-new VkDropdown({ element: document.getElementById("test2") });
+new VkDropdown(document.getElementById("dropdown1"));
+new VkDropdown({ element: document.getElementById("dropdown2"), placeholder: "Введите имя" });
