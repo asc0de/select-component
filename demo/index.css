@@ -1,0 +1,16 @@
+body {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #edeef0;
+}
+
+body .dropdowns-area {
+    display: flex;
+    margin-top: 10vh;
+    justify-content: space-between;
+    width: 50vw;
+}
