@@ -1,0 +1,27 @@
+.vk-dropdown-collection {
+    background-color: #fff;
+    border: 1px solid #d3d9de;
+    border-top: none;
+}
+
+.vk-dropdown-collection .vk-dropdown-collection__item {
+    height: 2.4em;
+    padding: 0.5em 0.7em;
+    border-top: 1px solid #e7e8ec;
+}
+
+.vk-dropdown-collection .vk-dropdown-collection__item:first-child {
+    border-top: 0;
+}
+
+.vk-dropdown-collection .vk-dropdown-collection__item:hover {
+    background-color: #f2f4f7;
+    cursor: pointer;
+}
+
+.vk-dropdown-collection .vk-dropdown-collection__item .vk-dropdown-collection__item__image {
+    height: 2.2em;
+    width: 2.2em;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+}

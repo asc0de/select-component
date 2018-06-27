@@ -10,9 +10,10 @@ gulp.task("clean", function() {
 
 gulp.task("prepare", ["clean"], function() {
     gulp.src([
-        "./dropdown/constants/dropdown-mode.js",
-        "./dropdown/shared/child-element.js",
+        "./dropdown/constants/*.js",
+        "./dropdown/shared/*.js",
         "./dropdown/input/input.js",
+        "./dropdown/collection/collection.js",
         "./dropdown/dropdown.js",
         "./index.js"
     ])
@@ -24,7 +25,7 @@ gulp.task("prepare", ["clean"], function() {
         .pipe(flatten())
         .pipe(gulp.dest(distFolder));
 
-    gulp.src(["./dropdown/dropdown.css", "./dropdown/input/input.css"])
+    gulp.src(["./dropdown/dropdown.css", "./dropdown/input/input.css", "./dropdown/collection/collection.css"])
         .pipe(concat("dropdown.css"))
         .pipe(gulp.dest(distFolder));
 

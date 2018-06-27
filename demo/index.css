@@ -14,3 +14,8 @@ body .dropdowns-area {
     justify-content: space-between;
     width: 70vw;
 }
+
+body .dropdowns-area #dropdown1,
+body .dropdowns-area #dropdown2 {
+    width: 20em;
+}

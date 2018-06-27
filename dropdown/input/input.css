@@ -8,10 +8,12 @@
     width: 0.85em;
     height: 0.85em;
     margin-left: -1.4em;
+    cursor: pointer;
 }
 .vk-dropdown__input input {
     outline: none;
+    width: 100%;
     margin: 0;
     border: 1px solid #d3d9de;
-    padding: 0.4em 1.8em 0.4em 0.8em;
+    padding: 0.5em 1.8em 0.5em 0.8em;
 }
