@@ -9,8 +9,8 @@ function VkDropdown(options) {
         this.element = options.element;
     }
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
-    this.input = new Input(this.element, options.placeholder);
-    this.collection = new Collection(this.element, this.mode);
+    this.input = new VkInput(this.element, options.placeholder);
+    this.collection = new VkCollection(this.element, this.mode);
 
     var onInputFocus = function(e) {
         this.collection.setItems(getUsers());

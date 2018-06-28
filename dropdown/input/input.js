@@ -1,5 +1,5 @@
-function Input(parent, placeholder) {
-    ChildElement.call(this, parent);
+function VkInput(parent, placeholder) {
+    VkChildElement.call(this, parent);
     this.placeholder = placeholder || "";
 
     this.createElement = function() {

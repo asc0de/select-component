@@ -1,4 +1,4 @@
-function ChildElement(parent) {
+function VkChildElement(parent) {
     this.parent = parent;
     this.events = [];
 

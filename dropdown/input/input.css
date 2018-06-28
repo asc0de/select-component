@@ -1,19 +1,24 @@
 .vk-dropdown__input {
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    border: 1px solid #d3d9de;
 }
 
 .vk-dropdown__input::after {
-    content: url(down-arrow.svg);
+    content: "";
+    background-image: url(down-arrow.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 0.85em;
     width: 0.85em;
-    height: 0.85em;
-    margin-left: -1.4em;
+    padding: 0 0.5em;
     cursor: pointer;
+    background-color: #fff;
 }
 .vk-dropdown__input input {
     outline: none;
     width: 100%;
     margin: 0;
-    border: 1px solid #d3d9de;
     padding: 0.5em 1.8em 0.5em 0.8em;
+    border: 0;
 }
