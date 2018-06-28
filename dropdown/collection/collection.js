@@ -13,7 +13,7 @@ function VkCollection(parent, mode) {
         this.items.forEach(
             function(item) {
                 var itemElement = new VkCollectionItem(this.element, item);
-                itemElement.appendDom();
+                itemElement.appendDom(item);
             }.bind(this)
         );
     };

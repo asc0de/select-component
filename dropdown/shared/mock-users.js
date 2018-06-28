@@ -12,8 +12,8 @@ function getUsers() {
         },
         {
             imgUrl: "https://pp.userapi.com/c841338/v841338120/3b14c/kjybYosMc_0.jpg?ava=1",
-            name: "Илья Суховей",
-            university: "БГТУ (Военмех)"
+            name: "Василий Котов",
+            university: ""
         }
     ];
 }

@@ -2,15 +2,15 @@ function VkChildElement(parent) {
     this.parent = parent;
     this.events = [];
 
-    var checkElement = function() {
-        if (!this.element) this.createElement();
+    var checkElement = function(model) {
+        if (!this.element) this.createElement(model);
     };
 
     this.createElement = function() {
         throw new Error('"createElement" function should be implemented for child elements');
     };
-    this.appendDom = function() {
-        checkElement.call(this);
+    this.appendDom = function(model) {
+        checkElement.call(this, model);
         this.parent.appendChild(this.element);
     };
     this.detachFromDom = function() {
