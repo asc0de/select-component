@@ -1,0 +1,22 @@
+body {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #edeef0;
+}
+
+body .dropdowns-area {
+    display: flex;
+    margin-top: 10vh;
+    justify-content: center;
+    width: 70vw;
+}
+
+body .dropdowns-area #dropdown1,
+body .dropdowns-area #dropdown2 {
+    width: 20em;
+}
