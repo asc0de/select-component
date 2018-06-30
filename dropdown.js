@@ -26,7 +26,7 @@ function VkDropdown(options) {
     };
 
     var onInputBlur = function(e) {
-        //this.collection.detachFromDom();
+        this.collection.detachFromDom();
     };
 
     var onInputKeyUp = function(e) {
