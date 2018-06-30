@@ -7,14 +7,19 @@ function VkCollection(parent, mode) {
         this.items = items || [];
     };
 
-    this.createElement = function() {
-        this.element = document.createElement("DIV");
-        this.element.classList.add("vk-dropdown-collection");
+    this.render = function() {
+        this.clearElement();
         this.items.forEach(
             function(item) {
                 var itemElement = new VkCollectionItem(this.element, item);
                 itemElement.appendDom(item);
             }.bind(this)
         );
+    };
+
+    this.createElement = function() {
+        this.element = document.createElement("DIV");
+        this.element.classList.add("vk-dropdown-collection");
+        this.render();
     };
 }

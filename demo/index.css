@@ -12,7 +12,7 @@ body {
 body .dropdowns-area {
     display: flex;
     margin-top: 10vh;
-    justify-content: space-between;
+    justify-content: center;
     width: 70vw;
 }
 

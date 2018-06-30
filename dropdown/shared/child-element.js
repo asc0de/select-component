@@ -1,6 +1,9 @@
 function VkChildElement(parent) {
+    VkBaseElement.call(this);
+
     this.parent = parent;
     this.events = [];
+    this.appended = false;
 
     var checkElement = function(model) {
         if (!this.element) this.createElement(model);
@@ -11,10 +14,26 @@ function VkChildElement(parent) {
     };
     this.appendDom = function(model) {
         checkElement.call(this, model);
-        this.parent.appendChild(this.element);
+        if (!this.appended) {
+            this.parent.appendChild(this.element);
+            this.appended = true;
+        } else {
+            this.show();
+        }
     };
-    this.detachFromDom = function() {
-        this.parent.removeChild(this.element);
+    this.detachFromDom = function(force) {
+        if (force) {
+            this.parent.removeChild(this.element);
+            this.appended = false;
+        } else {
+            this.hide();
+        }
+    };
+    this.hide = function() {
+        this.element.style.display = "none";
+    };
+    this.show = function() {
+        this.element.style.display = "";
     };
     this.addEvent = function(eventName, callback, useCapture) {
         checkElement.call(this);
@@ -36,5 +55,10 @@ function VkChildElement(parent) {
             }.bind(this)
         );
         this.detachFromDom();
+    };
+    this.clearElement = function() {
+        while (this.element.firstChild) {
+            this.element.removeChild(this.element.firstChild);
+        }
     };
 }
