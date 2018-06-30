@@ -4,6 +4,7 @@ var concat = require("gulp-concat");
 var del = require("del");
 var insert = require("gulp-insert");
 var connect = require("gulp-connect");
+var ghpages = require("gh-pages");
 var distFolder = "dist";
 
 gulp.task("clean", function() {
@@ -61,3 +62,7 @@ gulp.task("prepare:watch", function() {
 });
 
 gulp.task("development", ["connect", "prepare", "prepare:watch"]);
+
+gulp.task("deploy", function() {
+    return ghpages.publish("dist");
+});
