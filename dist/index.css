@@ -18,7 +18,7 @@ body .dropdowns-area {
 }
 
 body .dropdowns-area .dropdowns-area__demo-container {
-    width: 30em;
+    width: 25em;
     padding: 1em;
     display: flex;
     flex-direction: column;
