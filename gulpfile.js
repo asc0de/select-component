@@ -26,12 +26,13 @@ gulp.task("js", function() {
         .src(["./dropdown/**/*.js", "./index.js"])
         .pipe(concat("dropdown.js"))
         .pipe(
-            insert.transform(function(contents, file) {
+            insert.transform(function(contents) {
                 return ";(function () {\r\n" + contents + "\r\n})();";
             })
         )
         .pipe(flatten())
-        .pipe(gulp.dest(distFolder));
+        .pipe(gulp.dest(distFolder))
+        .pipe(connect.reload());
 });
 
 gulp.task("demo", function() {
@@ -58,7 +59,7 @@ gulp.task("images", function() {
 });
 
 gulp.task("prepare:watch", function() {
-    return gulp.watch(["./demo/**/*.html", "./dropdown/**/*.js", "/dropdown/**/*.css"], ["prepare"]);
+    return gulp.watch(["./demo/**/*.html", "./dropdown/**/*.js", "./dropdown/**/*.css"], ["prepare"]);
 });
 
 gulp.task("development", ["connect", "prepare", "prepare:watch"]);

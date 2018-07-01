@@ -1,14 +1,20 @@
-function VkCollectionItem(parent, item) {
+function VkCollectionItem(parent, item, options) {
     VkChildElement.call(this, parent);
     this.item = item;
+    this.avatarEnabled = options.avatarEnabled || false;
+    this.dataProp = options.dataProp || "id";
 
     this.createElement = function(model) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection__item");
+        this.element.setAttribute("data-value", this.item[this.dataProp]);
 
-        var imageElement = document.createElement("DIV");
-        imageElement.style.backgroundImage = "url(" + item.imgUrl + ")";
-        imageElement.classList.add("vk-dropdown-collection__item__image");
+        if (this.avatarEnabled) {
+            var imageElement = document.createElement("DIV");
+            imageElement.style.backgroundImage = "url(" + item.imgUrl + ")";
+            imageElement.classList.add("vk-dropdown-collection__item__image");
+            this.element.appendChild(imageElement);
+        }
 
         var infoContainer = document.createElement("DIV");
         infoContainer.classList.add("vk-dropdown-collection__item__info");
@@ -21,7 +27,6 @@ function VkCollectionItem(parent, item) {
         universityElement.innerHTML = model.university;
         infoContainer.appendChild(universityElement);
 
-        this.element.appendChild(imageElement);
         this.element.appendChild(infoContainer);
     };
 }

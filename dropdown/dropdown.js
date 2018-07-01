@@ -12,12 +12,24 @@ function VkDropdown(options) {
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
+    this.searchEnabled = options.search || false;
+    this.avatarEnabled = options.avatar || false;
     this.service = new VkDropdownService();
+    this.selectedItems = [];
     this.items = getUsers();
 
+    this.onSelect = function(item) {
+        this.selectedItems.push(item);
+        this.input.setSelectedItems(this.selectedItems);
+    };
+
     //elements
-    this.input = new VkInput(this.element, options.placeholder);
-    this.collection = new VkCollection(this.element, this.mode);
+    this.input = new VkInput(this.element, { placeholder: options.placeholder, selectedItems: this.selectedItems });
+    this.collection = new VkCollection(this.element, {
+        mode: this.mode,
+        avatarEnabled: this.avatarEnabled,
+        onSelect: this.onSelect.bind(this)
+    });
 
     var onInputFocus = function(e) {
         this.collection.setItems(this.items);
@@ -52,8 +64,12 @@ function VkDropdown(options) {
         this.element.classList.add("vk-dropdown");
         this.input.appendDom();
         var debouncedInputKeyUp = this.helper.debounce(onInputKeyUp.bind(this));
-        this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
-        this.input.addEvent("focus", onInputFocus.bind(this), true);
+        if (this.searchEnabled) {
+            this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
+        } else {
+            this.input.disable();
+        }
+        this.input.addEvent("click", onInputFocus.bind(this), true);
         this.input.addEvent("blur", onInputBlur.bind(this), true);
     };
 

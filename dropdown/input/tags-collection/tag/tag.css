@@ -1,0 +1,15 @@
+.vk-tags-collection__tag {
+    display: flex;
+    align-items: center;
+    background-color: #5181b8;
+    color: #fff;
+    padding: 0.2em 0.5em;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+    font-size: 0.8em;
+    font-weight: 700;
+    cursor: default;
+    margin: 0.15em 0.15em;
+}

@@ -1,0 +1,11 @@
+.vk-tags-collection {
+    background-color: #fff;
+    padding: 0.2em;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+.vk-tags-collection:empty {
+    padding: 0;
+}

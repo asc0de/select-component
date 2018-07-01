@@ -2,6 +2,8 @@
     display: flex;
     align-items: stretch;
     border: 1px solid #d3d9de;
+    background-color: #fff;
+    flex-wrap: wrap;
 }
 
 .vk-dropdown__input::after {
@@ -10,15 +12,18 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: 0.85em;
-    width: 0.85em;
     padding: 0 0.5em;
     cursor: pointer;
     background-color: #fff;
+    width: 1em;
 }
 .vk-dropdown__input input {
     outline: none;
-    width: 100%;
+    flex: 1 1 30%;
     margin: 0;
     padding: 0.5em 1.8em 0.5em 0.8em;
     border: 0;
+}
+.vk-dropdown__input input:disabled {
+    background-color: #fff !important;
 }

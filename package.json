@@ -5,7 +5,6 @@
     "main": "component.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "prestart": "gulp development",
         "start": "gulp development",
         "watch": "gulp prepare:watch",
         "deploy": "gulp deploy"
