@@ -12,7 +12,7 @@ function VkCollection(parent, options) {
     this.selectItem = function(e) {
         var filteredItems = this.items.filter(
             function(item) {
-                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"));
+                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"), 10);
             }.bind(this)
         );
         if (filteredItems && filteredItems.length) {

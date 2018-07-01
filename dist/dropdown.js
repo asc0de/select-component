@@ -15,6 +15,8 @@ function VkDropdown(options) {
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
     this.searchEnabled = options.search || false;
     this.avatarEnabled = options.avatar || false;
+    this.dataProp = options.dataProp || "id";
+    this.labelProp = options.labelProp || "name";
     this.service = new VkDropdownService();
     this.selectedItems = [];
     this.items = getUsers();
@@ -24,8 +26,28 @@ function VkDropdown(options) {
         this.input.setSelectedItems(this.selectedItems);
     };
 
+    this.onRemove = function(id) {
+        this.selectedItems.splice(
+            this.selectedItems
+                .map(
+                    function(item) {
+                        return item[this.dataProp];
+                    }.bind(this)
+                )
+                .indexOf(id),
+            1
+        );
+
+        this.input.setSelectedItems(this.selectedItems);
+        this.input.tagsCollection.render();
+    };
+
     //elements
-    this.input = new VkInput(this.element, { placeholder: options.placeholder, selectedItems: this.selectedItems });
+    this.input = new VkInput(this.element, {
+        placeholder: options.placeholder,
+        selectedItems: this.selectedItems,
+        onRemove: this.onRemove.bind(this)
+    });
     this.collection = new VkCollection(this.element, {
         mode: this.mode,
         avatarEnabled: this.avatarEnabled,
@@ -70,7 +92,7 @@ function VkDropdown(options) {
         } else {
             this.input.disable();
         }
-        this.input.addEvent("click", onInputFocus.bind(this), true);
+        this.input.addEvent("click", onInputFocus.bind(this));
         this.input.addEvent("blur", onInputBlur.bind(this), true);
     };
 
@@ -101,7 +123,7 @@ function VkCollection(parent, options) {
     this.selectItem = function(e) {
         var filteredItems = this.items.filter(
             function(item) {
-                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"));
+                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"), 10);
             }.bind(this)
         );
         if (filteredItems && filteredItems.length) {
@@ -148,6 +170,39 @@ function getKeyCodes() {
     Object.defineProperty(codes, "ALT", { value: 17, writable: false });
 
     return codes;
+}
+
+function VkInput(parent, options) {
+    VkChildElement.call(this, parent);
+    this.placeholder = options.placeholder || "";
+    this.selectedItems = options.selectedItems || [];
+
+    this.setSelectedItems = function(items) {
+        this.tagsCollection.setSelectedItems(items);
+        this.tagsCollection.render();
+    };
+
+    this.createElement = function() {
+        this.element = document.createElement("DIV");
+        this.element.classList.add("vk-dropdown__input");
+        this.tagsCollection = new VkTagsCollection(this.element, this.selectedItems, {
+            labelProp: options.labelProp,
+            dataProp: options.dataProp,
+            onRemove: options.onRemove
+        });
+        this.tagsCollection.appendDom();
+        var input = document.createElement("INPUT");
+        if (this.placeholder) input.placeholder = this.placeholder;
+        this.element.appendChild(input);
+    };
+
+    this.disable = function() {
+        this.element.childNodes[1].setAttribute("disabled", "disabled");
+    };
+
+    this.enable = function() {
+        this.element.childNodes[1].removeAttribute("disabled");
+    };
 }
 
 function VkBaseElement() {
@@ -256,38 +311,6 @@ function getUsers() {
     ];
 }
 
-function VkInput(parent, options) {
-    VkChildElement.call(this, parent);
-    this.placeholder = options.placeholder || "";
-    this.selectedItems = options.selectedItems || [];
-
-    this.setSelectedItems = function(items) {
-        this.tagsCollection.setSelectedItems(items);
-        this.tagsCollection.render();
-    };
-
-    this.createElement = function() {
-        this.element = document.createElement("DIV");
-        this.element.classList.add("vk-dropdown__input");
-        this.tagsCollection = new VkTagsCollection(this.element, this.selectedItems, {
-            labelProp: options.labelProp,
-            dataProp: options.dataProp
-        });
-        this.tagsCollection.appendDom();
-        var input = document.createElement("INPUT");
-        if (this.placeholder) input.placeholder = this.placeholder;
-        this.element.appendChild(input);
-    };
-
-    this.disable = function() {
-        this.element.childNodes[1].setAttribute("disabled", "disabled");
-    };
-
-    this.enable = function() {
-        this.element.childNodes[1].removeAttribute("disabled");
-    };
-}
-
 function VkCollectionItem(parent, item, options) {
     VkChildElement.call(this, parent);
     this.item = item;
@@ -335,7 +358,11 @@ function VkTagsCollection(parent, items, options) {
         this.clearElement();
         this.items.forEach(
             function(item) {
-                var itemElement = new VkTag(this.element, item, { labelProp: this.labelProp, dataProp: this.dataProp });
+                var itemElement = new VkTag(this.element, item, {
+                    labelProp: this.labelProp,
+                    dataProp: this.dataProp,
+                    onRemove: options.onRemove
+                });
                 itemElement.appendDom(item);
             }.bind(this)
         );
@@ -352,12 +379,21 @@ function VkTag(parent, item, options) {
     this.item = item;
     this.dataProp = options.dataProp || "id";
     this.labelProp = options.labelProp || "name";
+    this.onRemove = options.onRemove;
 
     this.createElement = function() {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-tags-collection__tag");
+        this.element.setAttribute("data-value", this.item[this.dataProp]);
         this.element.innerText = this.item[this.labelProp];
     };
+
+    var onDeleteClick = function(e) {
+        e.stopPropagation();
+        this.onRemove(parseInt(e.target.getAttribute("data-value"), 10));
+    };
+
+    this.addEvent("click", onDeleteClick.bind(this));
 }
 
 // new VkDropdown(document.getElementById("dropdown1"));

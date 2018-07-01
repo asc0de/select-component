@@ -109,3 +109,16 @@
     cursor: default;
     margin: 0.15em 0.15em;
 }
+
+.vk-tags-collection__tag::after {
+    content: "\2716";
+    margin-left: 0.3em;
+    color: #fff;
+    opacity: 0.5;
+    transition: opacity 200ms linear;
+    cursor: pointer;
+}
+
+.vk-tags-collection__tag:hover::after {
+    opacity: 1;
+}

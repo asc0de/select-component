@@ -14,6 +14,8 @@ function VkDropdown(options) {
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
     this.searchEnabled = options.search || false;
     this.avatarEnabled = options.avatar || false;
+    this.dataProp = options.dataProp || "id";
+    this.labelProp = options.labelProp || "name";
     this.service = new VkDropdownService();
     this.selectedItems = [];
     this.items = getUsers();
@@ -23,8 +25,28 @@ function VkDropdown(options) {
         this.input.setSelectedItems(this.selectedItems);
     };
 
+    this.onRemove = function(id) {
+        this.selectedItems.splice(
+            this.selectedItems
+                .map(
+                    function(item) {
+                        return item[this.dataProp];
+                    }.bind(this)
+                )
+                .indexOf(id),
+            1
+        );
+
+        this.input.setSelectedItems(this.selectedItems);
+        this.input.tagsCollection.render();
+    };
+
     //elements
-    this.input = new VkInput(this.element, { placeholder: options.placeholder, selectedItems: this.selectedItems });
+    this.input = new VkInput(this.element, {
+        placeholder: options.placeholder,
+        selectedItems: this.selectedItems,
+        onRemove: this.onRemove.bind(this)
+    });
     this.collection = new VkCollection(this.element, {
         mode: this.mode,
         avatarEnabled: this.avatarEnabled,
@@ -69,7 +91,7 @@ function VkDropdown(options) {
         } else {
             this.input.disable();
         }
-        this.input.addEvent("click", onInputFocus.bind(this), true);
+        this.input.addEvent("click", onInputFocus.bind(this));
         this.input.addEvent("blur", onInputBlur.bind(this), true);
     };
 

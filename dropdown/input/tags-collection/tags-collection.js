@@ -12,7 +12,11 @@ function VkTagsCollection(parent, items, options) {
         this.clearElement();
         this.items.forEach(
             function(item) {
-                var itemElement = new VkTag(this.element, item, { labelProp: this.labelProp, dataProp: this.dataProp });
+                var itemElement = new VkTag(this.element, item, {
+                    labelProp: this.labelProp,
+                    dataProp: this.dataProp,
+                    onRemove: options.onRemove
+                });
                 itemElement.appendDom(item);
             }.bind(this)
         );

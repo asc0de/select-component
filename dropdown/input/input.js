@@ -13,7 +13,8 @@ function VkInput(parent, options) {
         this.element.classList.add("vk-dropdown__input");
         this.tagsCollection = new VkTagsCollection(this.element, this.selectedItems, {
             labelProp: options.labelProp,
-            dataProp: options.dataProp
+            dataProp: options.dataProp,
+            onRemove: options.onRemove
         });
         this.tagsCollection.appendDom();
         var input = document.createElement("INPUT");
