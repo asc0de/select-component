@@ -17,9 +17,17 @@ body .dropdowns-area {
     width: 70vw;
 }
 
-body .dropdowns-area #dropdown1,
-body .dropdowns-area #dropdown2,
-body .dropdowns-area #dropdown3,
-body .dropdowns-area #dropdown4 {
-    width: 20em;
+body .dropdowns-area .dropdowns-area__demo-container {
+    width: 30em;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dropdowns-area__demo-container__label {
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 1.5em;
+    margin: 0.5em 0;
 }
