@@ -4,6 +4,11 @@ function VkCollectionItem(parent, item, options) {
     this.avatarEnabled = options.avatarEnabled || false;
     this.dataProp = options.dataProp || "id";
 
+    this.onSelectItem = function(e) {
+        e.stopPropagation();
+        options.onSelect(parseInt(this.element.getAttribute("data-value"), 10));
+    };
+
     this.createElement = function(model) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection__item");
@@ -28,5 +33,7 @@ function VkCollectionItem(parent, item, options) {
         infoContainer.appendChild(universityElement);
 
         this.element.appendChild(infoContainer);
+
+        this.addEvent("mousedown", this.onSelectItem.bind(this));
     };
 }

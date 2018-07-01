@@ -9,23 +9,19 @@ function VkCollection(parent, options) {
     this.setItems = function(items) {
         this.items = items || [];
     };
-    this.selectItem = function(e) {
-        var filteredItems = this.items.filter(
-            function(item) {
-                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"), 10);
-            }.bind(this)
-        );
-        if (filteredItems && filteredItems.length) {
-            this.onSelect(filteredItems[0]);
-            this.hide();
-        }
+    this.onSelect = function(id) {
+        options.onSelect(id);
+        this.hide();
     };
 
     this.render = function() {
         this.clearElement();
         this.items.forEach(
             function(item) {
-                var itemElement = new VkCollectionItem(this.element, item, { avatarEnabled: this.avatarEnabled });
+                var itemElement = new VkCollectionItem(this.element, item, {
+                    avatarEnabled: this.avatarEnabled,
+                    onSelect: this.onSelect.bind(this)
+                });
                 itemElement.appendDom(item);
             }.bind(this)
         );
@@ -35,6 +31,5 @@ function VkCollection(parent, options) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection");
         this.render();
-        this.addEvent("click", this.selectItem.bind(this));
     };
 }

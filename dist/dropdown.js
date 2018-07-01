@@ -21,7 +21,14 @@ function VkDropdown(options) {
     this.selectedItems = [];
     this.items = getUsers();
 
-    this.onSelect = function(item) {
+    this.onSelect = function(id) {
+        var filteredItems = this.items.filter(
+            function(item) {
+                return item[this.dataProp] === id;
+            }.bind(this)
+        );
+        if (!filteredItems || !filteredItems.length) return;
+        var item = filteredItems[0];
         this.selectedItems.push(item);
         this.input.setSelectedItems(this.selectedItems);
         var selectedItemIds = this.selectedItems.map(
@@ -40,6 +47,7 @@ function VkDropdown(options) {
         );
         this.collection.setItems(this.items);
         this.collection.render();
+        this.input.inputElement.value = "";
     };
 
     this.onRemove = function(id) {
@@ -70,13 +78,14 @@ function VkDropdown(options) {
         onSelect: this.onSelect.bind(this)
     });
 
-    var onInputFocus = function(e) {
+    var onInputClick = function(e) {
         this.collection.setItems(this.items);
         this.collection.appendDom();
     };
 
     var onInputBlur = function(e) {
         this.collection.detachFromDom();
+        this.input.inputElement.value = "";
     };
 
     var onInputKeyUp = function(e) {
@@ -108,8 +117,8 @@ function VkDropdown(options) {
         } else {
             this.input.disable();
         }
-        this.input.addEvent("click", onInputFocus.bind(this));
         this.input.addEvent("blur", onInputBlur.bind(this), true);
+        this.input.addEvent("click", onInputClick.bind(this), true);
     };
 
     this.appendDom();
@@ -136,23 +145,19 @@ function VkCollection(parent, options) {
     this.setItems = function(items) {
         this.items = items || [];
     };
-    this.selectItem = function(e) {
-        var filteredItems = this.items.filter(
-            function(item) {
-                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"), 10);
-            }.bind(this)
-        );
-        if (filteredItems && filteredItems.length) {
-            this.onSelect(filteredItems[0]);
-            this.hide();
-        }
+    this.onSelect = function(id) {
+        options.onSelect(id);
+        this.hide();
     };
 
     this.render = function() {
         this.clearElement();
         this.items.forEach(
             function(item) {
-                var itemElement = new VkCollectionItem(this.element, item, { avatarEnabled: this.avatarEnabled });
+                var itemElement = new VkCollectionItem(this.element, item, {
+                    avatarEnabled: this.avatarEnabled,
+                    onSelect: this.onSelect.bind(this)
+                });
                 itemElement.appendDom(item);
             }.bind(this)
         );
@@ -162,7 +167,6 @@ function VkCollection(parent, options) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection");
         this.render();
-        this.addEvent("click", this.selectItem.bind(this));
     };
 }
 
@@ -209,7 +213,8 @@ function VkInput(parent, options) {
         this.tagsCollection.appendDom();
         var input = document.createElement("INPUT");
         if (this.placeholder) input.placeholder = this.placeholder;
-        this.element.appendChild(input);
+        this.inputElement = input;
+        this.element.appendChild(this.inputElement);
     };
 
     this.disable = function() {
@@ -323,6 +328,18 @@ function getUsers() {
             imgUrl: "https://pp.userapi.com/c841338/v841338120/3b14c/kjybYosMc_0.jpg?ava=1",
             name: "Василий Котов",
             university: ""
+        },
+        {
+            id: 4,
+            imgUrl: "https://pp.userapi.com/c624626/v624626708/3fdbe/z1YhrwafU64.jpg?ava=1",
+            name: "Марина Полякова",
+            university: "СПбГХФА"
+        },
+        {
+            id: 5,
+            imgUrl: "https://pp.userapi.com/c629320/v629320419/3349a/V3t3mqmJMiE.jpg?ava=1",
+            name: "Максим Левшин",
+            university: ""
         }
     ];
 }
@@ -332,6 +349,11 @@ function VkCollectionItem(parent, item, options) {
     this.item = item;
     this.avatarEnabled = options.avatarEnabled || false;
     this.dataProp = options.dataProp || "id";
+
+    this.onSelectItem = function(e) {
+        e.stopPropagation();
+        options.onSelect(parseInt(this.element.getAttribute("data-value"), 10));
+    };
 
     this.createElement = function(model) {
         this.element = document.createElement("DIV");
@@ -357,6 +379,8 @@ function VkCollectionItem(parent, item, options) {
         infoContainer.appendChild(universityElement);
 
         this.element.appendChild(infoContainer);
+
+        this.addEvent("mousedown", this.onSelectItem.bind(this));
     };
 }
 
@@ -409,7 +433,7 @@ function VkTag(parent, item, options) {
         this.onRemove(parseInt(e.target.getAttribute("data-value"), 10));
     };
 
-    this.addEvent("click", onDeleteClick.bind(this));
+    this.addEvent("mousedown", onDeleteClick.bind(this), true);
 }
 
 // new VkDropdown(document.getElementById("dropdown1"));

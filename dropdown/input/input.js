@@ -19,7 +19,8 @@ function VkInput(parent, options) {
         this.tagsCollection.appendDom();
         var input = document.createElement("INPUT");
         if (this.placeholder) input.placeholder = this.placeholder;
-        this.element.appendChild(input);
+        this.inputElement = input;
+        this.element.appendChild(this.inputElement);
     };
 
     this.disable = function() {

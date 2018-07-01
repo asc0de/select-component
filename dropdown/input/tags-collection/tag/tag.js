@@ -17,5 +17,5 @@ function VkTag(parent, item, options) {
         this.onRemove(parseInt(e.target.getAttribute("data-value"), 10));
     };
 
-    this.addEvent("click", onDeleteClick.bind(this));
+    this.addEvent("mousedown", onDeleteClick.bind(this), true);
 }

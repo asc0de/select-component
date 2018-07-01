@@ -20,7 +20,14 @@ function VkDropdown(options) {
     this.selectedItems = [];
     this.items = getUsers();
 
-    this.onSelect = function(item) {
+    this.onSelect = function(id) {
+        var filteredItems = this.items.filter(
+            function(item) {
+                return item[this.dataProp] === id;
+            }.bind(this)
+        );
+        if (!filteredItems || !filteredItems.length) return;
+        var item = filteredItems[0];
         this.selectedItems.push(item);
         this.input.setSelectedItems(this.selectedItems);
         var selectedItemIds = this.selectedItems.map(
@@ -39,6 +46,7 @@ function VkDropdown(options) {
         );
         this.collection.setItems(this.items);
         this.collection.render();
+        this.input.inputElement.value = "";
     };
 
     this.onRemove = function(id) {
@@ -69,13 +77,14 @@ function VkDropdown(options) {
         onSelect: this.onSelect.bind(this)
     });
 
-    var onInputFocus = function(e) {
+    var onInputClick = function(e) {
         this.collection.setItems(this.items);
         this.collection.appendDom();
     };
 
     var onInputBlur = function(e) {
         this.collection.detachFromDom();
+        this.input.inputElement.value = "";
     };
 
     var onInputKeyUp = function(e) {
@@ -107,8 +116,8 @@ function VkDropdown(options) {
         } else {
             this.input.disable();
         }
-        this.input.addEvent("click", onInputFocus.bind(this));
         this.input.addEvent("blur", onInputBlur.bind(this), true);
+        this.input.addEvent("click", onInputClick.bind(this), true);
     };
 
     this.appendDom();

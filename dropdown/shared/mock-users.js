@@ -17,6 +17,18 @@ function getUsers() {
             imgUrl: "https://pp.userapi.com/c841338/v841338120/3b14c/kjybYosMc_0.jpg?ava=1",
             name: "Василий Котов",
             university: ""
+        },
+        {
+            id: 4,
+            imgUrl: "https://pp.userapi.com/c624626/v624626708/3fdbe/z1YhrwafU64.jpg?ava=1",
+            name: "Марина Полякова",
+            university: "СПбГХФА"
+        },
+        {
+            id: 5,
+            imgUrl: "https://pp.userapi.com/c629320/v629320419/3349a/V3t3mqmJMiE.jpg?ava=1",
+            name: "Максим Левшин",
+            university: ""
         }
     ];
 }
