@@ -13,12 +13,46 @@ function VkDropdown(options) {
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
+    this.searchEnabled = options.search || false;
+    this.avatarEnabled = options.avatar || false;
+    this.dataProp = options.dataProp || "id";
+    this.labelProp = options.labelProp || "name";
     this.service = new VkDropdownService();
+    this.selectedItems = [];
     this.items = getUsers();
 
+    this.onSelect = function(item) {
+        this.selectedItems.push(item);
+        this.input.setSelectedItems(this.selectedItems);
+    };
+
+    this.onRemove = function(id) {
+        this.selectedItems.splice(
+            this.selectedItems
+                .map(
+                    function(item) {
+                        return item[this.dataProp];
+                    }.bind(this)
+                )
+                .indexOf(id),
+            1
+        );
+
+        this.input.setSelectedItems(this.selectedItems);
+        this.input.tagsCollection.render();
+    };
+
     //elements
-    this.input = new VkInput(this.element, options.placeholder);
-    this.collection = new VkCollection(this.element, this.mode);
+    this.input = new VkInput(this.element, {
+        placeholder: options.placeholder,
+        selectedItems: this.selectedItems,
+        onRemove: this.onRemove.bind(this)
+    });
+    this.collection = new VkCollection(this.element, {
+        mode: this.mode,
+        avatarEnabled: this.avatarEnabled,
+        onSelect: this.onSelect.bind(this)
+    });
 
     var onInputFocus = function(e) {
         this.collection.setItems(this.items);
@@ -53,8 +87,12 @@ function VkDropdown(options) {
         this.element.classList.add("vk-dropdown");
         this.input.appendDom();
         var debouncedInputKeyUp = this.helper.debounce(onInputKeyUp.bind(this));
-        this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
-        this.input.addEvent("focus", onInputFocus.bind(this), true);
+        if (this.searchEnabled) {
+            this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
+        } else {
+            this.input.disable();
+        }
+        this.input.addEvent("click", onInputFocus.bind(this));
         this.input.addEvent("blur", onInputBlur.bind(this), true);
     };
 
@@ -71,20 +109,34 @@ function VkDropdownService() {
     };
 }
 
-function VkCollection(parent, mode) {
+function VkCollection(parent, options) {
     VkChildElement.call(this, parent);
-    this.mode = mode;
+    this.mode = options.mode || DropdownMode.SINGLE_SELECT;
+    this.avatarEnabled = options.avatarEnabled || false;
+    this.dataProp = options.dataProp || "id";
+    this.onSelect = options.onSelect;
     this.items = [];
 
     this.setItems = function(items) {
         this.items = items || [];
+    };
+    this.selectItem = function(e) {
+        var filteredItems = this.items.filter(
+            function(item) {
+                return item[this.dataProp] === parseInt(e.target.getAttribute("data-value"), 10);
+            }.bind(this)
+        );
+        if (filteredItems && filteredItems.length) {
+            this.onSelect(filteredItems[0]);
+            this.hide();
+        }
     };
 
     this.render = function() {
         this.clearElement();
         this.items.forEach(
             function(item) {
-                var itemElement = new VkCollectionItem(this.element, item);
+                var itemElement = new VkCollectionItem(this.element, item, { avatarEnabled: this.avatarEnabled });
                 itemElement.appendDom(item);
             }.bind(this)
         );
@@ -94,6 +146,7 @@ function VkCollection(parent, mode) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection");
         this.render();
+        this.addEvent("click", this.selectItem.bind(this));
     };
 }
 
@@ -119,16 +172,36 @@ function getKeyCodes() {
     return codes;
 }
 
-function VkInput(parent, placeholder) {
+function VkInput(parent, options) {
     VkChildElement.call(this, parent);
-    this.placeholder = placeholder || "";
+    this.placeholder = options.placeholder || "";
+    this.selectedItems = options.selectedItems || [];
+
+    this.setSelectedItems = function(items) {
+        this.tagsCollection.setSelectedItems(items);
+        this.tagsCollection.render();
+    };
 
     this.createElement = function() {
-        var input = document.createElement("INPUT");
-        input.placeholder = this.placeholder;
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown__input");
+        this.tagsCollection = new VkTagsCollection(this.element, this.selectedItems, {
+            labelProp: options.labelProp,
+            dataProp: options.dataProp,
+            onRemove: options.onRemove
+        });
+        this.tagsCollection.appendDom();
+        var input = document.createElement("INPUT");
+        if (this.placeholder) input.placeholder = this.placeholder;
         this.element.appendChild(input);
+    };
+
+    this.disable = function() {
+        this.element.childNodes[1].setAttribute("disabled", "disabled");
+    };
+
+    this.enable = function() {
+        this.element.childNodes[1].removeAttribute("disabled");
     };
 }
 
@@ -218,16 +291,19 @@ function VkElementHelper() {
 function getUsers() {
     return [
         {
+            id: 1,
             imgUrl: "https://pp.userapi.com/c841339/v841339466/51b24/unRuQrPG6kA.jpg?ava=1v",
             name: "Илья Суховей",
             university: "БГТУ (Военмех)"
         },
         {
+            id: 2,
             imgUrl: "https://pp.userapi.com/c846021/v846021248/79dc8/VdouMjPTBy0.jpg?ava=1",
             name: "Альбина Деханова",
             university: ""
         },
         {
+            id: 3,
             imgUrl: "https://pp.userapi.com/c841338/v841338120/3b14c/kjybYosMc_0.jpg?ava=1",
             name: "Василий Котов",
             university: ""
@@ -235,17 +311,23 @@ function getUsers() {
     ];
 }
 
-function VkCollectionItem(parent, item) {
+function VkCollectionItem(parent, item, options) {
     VkChildElement.call(this, parent);
     this.item = item;
+    this.avatarEnabled = options.avatarEnabled || false;
+    this.dataProp = options.dataProp || "id";
 
     this.createElement = function(model) {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection__item");
+        this.element.setAttribute("data-value", this.item[this.dataProp]);
 
-        var imageElement = document.createElement("DIV");
-        imageElement.style.backgroundImage = "url(" + item.imgUrl + ")";
-        imageElement.classList.add("vk-dropdown-collection__item__image");
+        if (this.avatarEnabled) {
+            var imageElement = document.createElement("DIV");
+            imageElement.style.backgroundImage = "url(" + item.imgUrl + ")";
+            imageElement.classList.add("vk-dropdown-collection__item__image");
+            this.element.appendChild(imageElement);
+        }
 
         var infoContainer = document.createElement("DIV");
         infoContainer.classList.add("vk-dropdown-collection__item__info");
@@ -258,12 +340,63 @@ function VkCollectionItem(parent, item) {
         universityElement.innerHTML = model.university;
         infoContainer.appendChild(universityElement);
 
-        this.element.appendChild(imageElement);
         this.element.appendChild(infoContainer);
     };
 }
 
+function VkTagsCollection(parent, items, options) {
+    VkChildElement.call(this, parent);
+    this.items = items;
+    this.dataProp = options.dataProp || "id";
+    this.labelProp = options.labelProp || "name";
+
+    this.setSelectedItems = function(items) {
+        this.items = items;
+    };
+
+    this.render = function() {
+        this.clearElement();
+        this.items.forEach(
+            function(item) {
+                var itemElement = new VkTag(this.element, item, {
+                    labelProp: this.labelProp,
+                    dataProp: this.dataProp,
+                    onRemove: options.onRemove
+                });
+                itemElement.appendDom(item);
+            }.bind(this)
+        );
+    };
+
+    this.createElement = function() {
+        this.element = document.createElement("DIV");
+        this.element.classList.add("vk-tags-collection");
+    };
+}
+
+function VkTag(parent, item, options) {
+    VkChildElement.call(this, parent);
+    this.item = item;
+    this.dataProp = options.dataProp || "id";
+    this.labelProp = options.labelProp || "name";
+    this.onRemove = options.onRemove;
+
+    this.createElement = function() {
+        this.element = document.createElement("DIV");
+        this.element.classList.add("vk-tags-collection__tag");
+        this.element.setAttribute("data-value", this.item[this.dataProp]);
+        this.element.innerText = this.item[this.labelProp];
+    };
+
+    var onDeleteClick = function(e) {
+        e.stopPropagation();
+        this.onRemove(parseInt(e.target.getAttribute("data-value"), 10));
+    };
+
+    this.addEvent("click", onDeleteClick.bind(this));
+}
+
 // new VkDropdown(document.getElementById("dropdown1"));
-new VkDropdown({ element: document.getElementById("dropdown2"), placeholder: "Введите имя" });
+new VkDropdown({ element: document.getElementById("dropdown2"), placeholder: "Введите имя", avatar: true });
 
 })();

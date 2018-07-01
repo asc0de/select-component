@@ -14,6 +14,8 @@
     display: flex;
     align-items: stretch;
     border: 1px solid #d3d9de;
+    background-color: #fff;
+    flex-wrap: wrap;
 }
 
 .vk-dropdown__input::after {
@@ -22,17 +24,20 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: 0.85em;
-    width: 0.85em;
     padding: 0 0.5em;
     cursor: pointer;
     background-color: #fff;
+    width: 1em;
 }
 .vk-dropdown__input input {
     outline: none;
-    width: 100%;
+    flex: 1 1 30%;
     margin: 0;
     padding: 0.5em 1.8em 0.5em 0.8em;
     border: 0;
+}
+.vk-dropdown__input input:disabled {
+    background-color: #fff !important;
 }
 
 .vk-dropdown-collection__item {
@@ -75,4 +80,45 @@
 .vk-dropdown-collection__item .vk-dropdown-collection__item__info span:last-child {
     font-weight: 400;
     font-size: 0.75em;
+}
+
+.vk-tags-collection {
+    background-color: #fff;
+    padding: 0.2em;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+.vk-tags-collection:empty {
+    padding: 0;
+}
+
+.vk-tags-collection__tag {
+    display: flex;
+    align-items: center;
+    background-color: #5181b8;
+    color: #fff;
+    padding: 0.2em 0.5em;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+    font-size: 0.8em;
+    font-weight: 700;
+    cursor: default;
+    margin: 0.15em 0.15em;
+}
+
+.vk-tags-collection__tag::after {
+    content: "\2716";
+    margin-left: 0.3em;
+    color: #fff;
+    opacity: 0.5;
+    transition: opacity 200ms linear;
+    cursor: pointer;
+}
+
+.vk-tags-collection__tag:hover::after {
+    opacity: 1;
 }
