@@ -1,6 +1,5 @@
 .vk-dropdown {
-    margin-left: 1em;
-    margin-right: 1em;
+    margin: 1em 0;
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
 }
 
@@ -8,6 +7,9 @@
     background-color: #fff;
     border: 1px solid #d3d9de;
     border-top: none;
+    position: absolute;
+    max-height: 20em;
+    overflow-y: auto;
 }
 
 .vk-dropdown__input {
@@ -29,13 +31,20 @@
     background-color: #fff;
     width: 1em;
 }
+
+.vk-dropdown__input--selected::after {
+    display: none;
+}
+
 .vk-dropdown__input input {
     outline: none;
     flex: 1 1 30%;
+    min-width: 20%;
     margin: 0;
     padding: 0.5em 1.8em 0.5em 0.8em;
     border: 0;
 }
+
 .vk-dropdown__input input:disabled {
     background-color: #fff !important;
 }
@@ -104,10 +113,11 @@
     white-space: nowrap;
     overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
-    font-size: 0.8em;
+    font-size: 0.75em;
     font-weight: 700;
     cursor: default;
     margin: 0.15em 0.15em;
+    user-select: none;
 }
 
 .vk-tags-collection__tag::after {
