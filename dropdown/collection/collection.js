@@ -30,6 +30,7 @@ function VkCollection(parent, options) {
     this.createElement = function() {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-dropdown-collection");
+        if (options.getWidth) this.element.style.width = (options.getWidth() || 200) + "px";
         this.render();
     };
 }

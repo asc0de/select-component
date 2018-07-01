@@ -1,10 +1,18 @@
 function VkInput(parent, options) {
     VkChildElement.call(this, parent);
+    var DropdownMode = getDropdownModes();
     this.placeholder = options.placeholder || "";
     this.selectedItems = options.selectedItems || [];
+    this.mode = options.mode || DropdownMode.SINGLE_SELECT;
 
     this.setSelectedItems = function(items) {
         this.tagsCollection.setSelectedItems(items);
+        if (items.length === 1 && this.mode === DropdownMode.SINGLE_SELECT) {
+            this.handleSelectedSingleMode();
+        }
+        if (items.length === 0 && this.mode === DropdownMode.SINGLE_SELECT) {
+            this.handleUnselectedSingleMode();
+        }
         this.tagsCollection.render();
     };
 
@@ -21,6 +29,20 @@ function VkInput(parent, options) {
         if (this.placeholder) input.placeholder = this.placeholder;
         this.inputElement = input;
         this.element.appendChild(this.inputElement);
+    };
+
+    this.handleSelectedSingleMode = function() {
+        this.inputElement.placeholder = "";
+        this.element.classList.add("vk-dropdown__input--selected");
+    };
+
+    this.handleUnselectedSingleMode = function() {
+        this.inputElement.placeholder = this.placeholder;
+        this.element.classList.remove("vk-dropdown__input--selected");
+    };
+
+    this.getWidth = function() {
+        return this.element.offsetWidth - 2;
     };
 
     this.disable = function() {

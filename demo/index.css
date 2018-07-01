@@ -11,12 +11,15 @@ body {
 
 body .dropdowns-area {
     display: flex;
+    flex-wrap: wrap;
     margin-top: 10vh;
     justify-content: center;
     width: 70vw;
 }
 
 body .dropdowns-area #dropdown1,
-body .dropdowns-area #dropdown2 {
+body .dropdowns-area #dropdown2,
+body .dropdowns-area #dropdown3,
+body .dropdowns-area #dropdown4 {
     width: 20em;
 }

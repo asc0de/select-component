@@ -39,14 +39,22 @@ function VkChildElement(parent) {
         checkElement.call(this);
         useCapture = useCapture || false;
         this.element.addEventListener(eventName, callback, useCapture);
-        this.events.push({ event: eventName, callback: callback });
+        this.events.push({ name: eventName, callback: callback, useCapture: useCapture });
     };
     this.removeEvent = function(eventName) {
         checkElement.call(this);
-        var currentEvent = this.events.filter(function(event) {
-            return eventName === event.name;
-        });
-        this.element.removeEventListener(currentEvent.name, currentEvent.callback);
+        var currentEvent = this.events.filter(function(currentEvent) {
+            return eventName === currentEvent.name;
+        })[0];
+        this.events.splice(
+            this.events
+                .map(function(currentEvent) {
+                    return currentEvent.name;
+                })
+                .indexOf(eventName),
+            1
+        );
+        this.element.removeEventListener(currentEvent.name, currentEvent.callback, currentEvent.useCapture);
     };
     this.destroyElement = function() {
         this.events.forEach(
