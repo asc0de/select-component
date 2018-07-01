@@ -8,6 +8,8 @@
     border: 1px solid #d3d9de;
     border-top: none;
     position: absolute;
+    max-height: 20em;
+    overflow-y: auto;
 }
 
 .vk-dropdown__input {
