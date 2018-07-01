@@ -23,6 +23,22 @@ function VkDropdown(options) {
     this.onSelect = function(item) {
         this.selectedItems.push(item);
         this.input.setSelectedItems(this.selectedItems);
+        var selectedItemIds = this.selectedItems.map(
+            function(selItem) {
+                return selItem[this.dataProp];
+            }.bind(this)
+        );
+        this.items = this.items.reduce(
+            function(newItems, currentItem) {
+                if (selectedItemIds.indexOf(currentItem[this.dataProp]) == -1) {
+                    newItems.push(currentItem);
+                }
+                return newItems;
+            }.bind(this),
+            []
+        );
+        this.collection.setItems(this.items);
+        this.collection.render();
     };
 
     this.onRemove = function(id) {
