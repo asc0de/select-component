@@ -12,6 +12,13 @@
     overflow-y: auto;
 }
 
+.vk-dropdown-collection--not-found {
+    text-align: center;
+    padding: 1em;
+    background-color: #f2f4f7;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+}
+
 .vk-dropdown__input {
     display: flex;
     align-items: stretch;
