@@ -106,14 +106,14 @@ function VkDropdown(options) {
             case KeyCode.ARROW_TOP:
             case KeyCode.ARROW_RIGHT:
             case KeyCode.ARROW_DOWN:
-            case KeyCode.ALT:
-            case KeyCode.SHIFT: {
+            case KeyCode.ALT: {
                 break;
             }
             default: {
                 this.items = this.initItems;
                 if (this.filterEnabled) {
                     this.items = this.service.search(e.target.value, this.items);
+                    this.filterItemsBySelected();
                     this.setCollectionItemsAndRender();
                 }
                 if (this.searchEnabled) {
@@ -363,8 +363,8 @@ function BaseService() {
     var proceedRequest = function(url, type, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open(type, settings.serverUrl + url, true);
-        xhr.onreadystatechange = function() {
-            callback(JSON.parse(xhr.responseText));
+        xhr.onload = function() {
+            callback(JSON.parse(xhr.responseText || {}));
         };
         xhr.send();
     };

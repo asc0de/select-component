@@ -12,7 +12,6 @@ body {
 body .dropdowns-area {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 10vh;
     justify-content: center;
     width: 70vw;
 }
@@ -28,6 +27,6 @@ body .dropdowns-area .dropdowns-area__demo-container {
 .dropdowns-area__demo-container__label {
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-weight: 400;
-    font-size: 1.5em;
+    font-size: 1.2em;
     margin: 0.5em 0;
 }

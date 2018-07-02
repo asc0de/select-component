@@ -105,14 +105,14 @@ function VkDropdown(options) {
             case KeyCode.ARROW_TOP:
             case KeyCode.ARROW_RIGHT:
             case KeyCode.ARROW_DOWN:
-            case KeyCode.ALT:
-            case KeyCode.SHIFT: {
+            case KeyCode.ALT: {
                 break;
             }
             default: {
                 this.items = this.initItems;
                 if (this.filterEnabled) {
                     this.items = this.service.search(e.target.value, this.items);
+                    this.filterItemsBySelected();
                     this.setCollectionItemsAndRender();
                 }
                 if (this.searchEnabled) {
