@@ -4,12 +4,7 @@ function VkDropdown(options) {
     var DropdownMode = getDropdownModes();
     var KeyCode = getKeyCodes();
     options = options || {};
-    if (!options.element && !(options instanceof Node)) throw new Error("Dom element should be initialized!");
-    if (options instanceof Node) {
-        this.element = options;
-    } else {
-        this.element = options.element;
-    }
+    this.element = options.element;
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
@@ -19,7 +14,7 @@ function VkDropdown(options) {
     this.labelProp = options.labelProp || "name";
     this.service = new VkDropdownService();
     this.selectedItems = [];
-    this.items = getUsers();
+    this.items = options.items;
 
     this.getValue = function() {
         if (this.mode === DropdownMode.SINGLE_SELECT) {
@@ -38,25 +33,12 @@ function VkDropdown(options) {
         );
         if (!filteredItems || !filteredItems.length) return;
         var item = filteredItems[0];
+        item.collectionIndex = this.items.indexOf(item);
         this.selectedItems.push(item);
         if (this.mode === DropdownMode.SINGLE_SELECT) {
             this.detachEvents();
         } else {
-            var selectedItemIds = this.selectedItems.map(
-                function(selItem) {
-                    return selItem[this.dataProp];
-                }.bind(this)
-            );
-            this.items = this.items.reduce(
-                function(newItems, currentItem) {
-                    if (selectedItemIds.indexOf(currentItem[this.dataProp]) == -1) {
-                        newItems.push(currentItem);
-                    }
-                    return newItems;
-                }.bind(this),
-                []
-            );
-            this.collection.setItems(this.items);
+            this.filterItemsBySelected();
             this.collection.render();
         }
         this.input.setSelectedItems(this.selectedItems);
@@ -64,7 +46,7 @@ function VkDropdown(options) {
     };
 
     this.onRemove = function(id) {
-        this.selectedItems.splice(
+        var removedItem = this.selectedItems.splice(
             this.selectedItems
                 .map(
                     function(item) {
@@ -73,7 +55,10 @@ function VkDropdown(options) {
                 )
                 .indexOf(id),
             1
-        );
+        )[0];
+
+        this.items.splice(removedItem.collectionIndex, 0, removedItem);
+        this.collection.render();
 
         if (this.selectedItems.length === 0 && this.mode === DropdownMode.SINGLE_SELECT) {
             this.attachEvents();
@@ -124,6 +109,24 @@ function VkDropdown(options) {
                 break;
             }
         }
+    };
+
+    this.filterItemsBySelected = function() {
+        var selectedItemIds = this.selectedItems.map(
+            function(selItem) {
+                return selItem[this.dataProp];
+            }.bind(this)
+        );
+        this.items = this.items.reduce(
+            function(newItems, currentItem) {
+                if (selectedItemIds.indexOf(currentItem[this.dataProp]) == -1) {
+                    newItems.push(currentItem);
+                }
+                return newItems;
+            }.bind(this),
+            []
+        );
+        this.collection.setItems(this.items);
     };
 
     this.attachEvents = function() {
@@ -193,6 +196,36 @@ function VkDropdownService() {
     };
 }
 
+function getDropdownModes() {
+    var modes = {};
+
+    Object.defineProperty(modes, "SINGLE_SELECT", { value: 1, writable: false });
+    Object.defineProperty(modes, "MULTI_SELECT", { value: 2, writable: false });
+
+    return modes;
+}
+
+function getKeyCodes() {
+    var codes = {};
+
+    Object.defineProperty(codes, "ARROW_LEFT", { value: 37, writable: false });
+    Object.defineProperty(codes, "ARROW_UP", { value: 38, writable: false });
+    Object.defineProperty(codes, "ARROW_RIGHT", { value: 39, writable: false });
+    Object.defineProperty(codes, "ARROW_DOWN", { value: 40, writable: false });
+    Object.defineProperty(codes, "SHIFT", { value: 16, writable: false });
+    Object.defineProperty(codes, "ALT", { value: 17, writable: false });
+
+    return codes;
+}
+
+function getSettings() {
+    var settings = {};
+
+    Object.defineProperty(settings, "serverUrl", { value: "http://localhost:8000/api/", writable: false });
+
+    return settings;
+}
+
 function VkCollection(parent, options) {
     VkChildElement.call(this, parent);
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
@@ -228,36 +261,6 @@ function VkCollection(parent, options) {
         if (options.getWidth) this.element.style.width = (options.getWidth() || 200) + "px";
         this.render();
     };
-}
-
-function getDropdownModes() {
-    var modes = {};
-
-    Object.defineProperty(modes, "SINGLE_SELECT", { value: 1, writable: false });
-    Object.defineProperty(modes, "MULTI_SELECT", { value: 2, writable: false });
-
-    return modes;
-}
-
-function getKeyCodes() {
-    var codes = {};
-
-    Object.defineProperty(codes, "ARROW_LEFT", { value: 37, writable: false });
-    Object.defineProperty(codes, "ARROW_UP", { value: 38, writable: false });
-    Object.defineProperty(codes, "ARROW_RIGHT", { value: 39, writable: false });
-    Object.defineProperty(codes, "ARROW_DOWN", { value: 40, writable: false });
-    Object.defineProperty(codes, "SHIFT", { value: 16, writable: false });
-    Object.defineProperty(codes, "ALT", { value: 17, writable: false });
-
-    return codes;
-}
-
-function getSettings() {
-    var settings = {};
-
-    Object.defineProperty(settings, "serverUrl", { value: "http://localhost:8000/api/", writable: false });
-
-    return settings;
 }
 
 function VkInput(parent, options) {
@@ -674,20 +677,23 @@ function VkTag(parent, item, options) {
 }
 
 var DropdownMode = getDropdownModes();
-new VkDropdown(document.getElementById("dropdown1"));
-new VkDropdown({ element: document.getElementById("dropdown2"), placeholder: "Выберите друга", avatar: true });
+var items = getUsers();
+new VkDropdown({ element: document.getElementById("dropdown1"), items: items });
+new VkDropdown({ element: document.getElementById("dropdown2"), placeholder: "Выберите друга", avatar: true, items: items });
 new VkDropdown({
     element: document.getElementById("dropdown3"),
     placeholder: "Выберите друзей",
     avatar: true,
-    mode: DropdownMode.MULTI_SELECT
+    mode: DropdownMode.MULTI_SELECT,
+    items: items
 });
 new VkDropdown({
     element: document.getElementById("dropdown4"),
     placeholder: "Введите имя",
     avatar: true,
     search: true,
-    mode: DropdownMode.MULTI_SELECT
+    mode: DropdownMode.MULTI_SELECT,
+    items: items
 });
 
 })();

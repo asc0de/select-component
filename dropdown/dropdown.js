@@ -3,12 +3,7 @@ function VkDropdown(options) {
     var DropdownMode = getDropdownModes();
     var KeyCode = getKeyCodes();
     options = options || {};
-    if (!options.element && !(options instanceof Node)) throw new Error("Dom element should be initialized!");
-    if (options instanceof Node) {
-        this.element = options;
-    } else {
-        this.element = options.element;
-    }
+    this.element = options.element;
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
@@ -18,7 +13,7 @@ function VkDropdown(options) {
     this.labelProp = options.labelProp || "name";
     this.service = new VkDropdownService();
     this.selectedItems = [];
-    this.items = getUsers();
+    this.items = options.items;
 
     this.getValue = function() {
         if (this.mode === DropdownMode.SINGLE_SELECT) {
@@ -37,25 +32,12 @@ function VkDropdown(options) {
         );
         if (!filteredItems || !filteredItems.length) return;
         var item = filteredItems[0];
+        item.collectionIndex = this.items.indexOf(item);
         this.selectedItems.push(item);
         if (this.mode === DropdownMode.SINGLE_SELECT) {
             this.detachEvents();
         } else {
-            var selectedItemIds = this.selectedItems.map(
-                function(selItem) {
-                    return selItem[this.dataProp];
-                }.bind(this)
-            );
-            this.items = this.items.reduce(
-                function(newItems, currentItem) {
-                    if (selectedItemIds.indexOf(currentItem[this.dataProp]) == -1) {
-                        newItems.push(currentItem);
-                    }
-                    return newItems;
-                }.bind(this),
-                []
-            );
-            this.collection.setItems(this.items);
+            this.filterItemsBySelected();
             this.collection.render();
         }
         this.input.setSelectedItems(this.selectedItems);
@@ -63,7 +45,7 @@ function VkDropdown(options) {
     };
 
     this.onRemove = function(id) {
-        this.selectedItems.splice(
+        var removedItem = this.selectedItems.splice(
             this.selectedItems
                 .map(
                     function(item) {
@@ -72,7 +54,10 @@ function VkDropdown(options) {
                 )
                 .indexOf(id),
             1
-        );
+        )[0];
+
+        this.items.splice(removedItem.collectionIndex, 0, removedItem);
+        this.collection.render();
 
         if (this.selectedItems.length === 0 && this.mode === DropdownMode.SINGLE_SELECT) {
             this.attachEvents();
@@ -123,6 +108,24 @@ function VkDropdown(options) {
                 break;
             }
         }
+    };
+
+    this.filterItemsBySelected = function() {
+        var selectedItemIds = this.selectedItems.map(
+            function(selItem) {
+                return selItem[this.dataProp];
+            }.bind(this)
+        );
+        this.items = this.items.reduce(
+            function(newItems, currentItem) {
+                if (selectedItemIds.indexOf(currentItem[this.dataProp]) == -1) {
+                    newItems.push(currentItem);
+                }
+                return newItems;
+            }.bind(this),
+            []
+        );
+        this.collection.setItems(this.items);
     };
 
     this.attachEvents = function() {
