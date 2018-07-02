@@ -91,9 +91,8 @@ function VkDropdown(options) {
             this.items = this.initItems;
             this.filterItemsBySelected();
         }
-        this.collection.setItems(this.items);
         this.collection.appendDom();
-        this.collection.render();
+        this.setCollectionItemsAndRender();
     };
 
     var onInputBlur = function(e) {
@@ -113,12 +112,28 @@ function VkDropdown(options) {
             }
             default: {
                 this.items = this.initItems;
-                if (this.filterEnabled) this.items = this.service.search(e.target.value, this.items);
-                this.collection.setItems(this.items);
-                this.collection.render();
+                if (this.filterEnabled) {
+                    this.items = this.service.search(e.target.value, this.items);
+                    this.setCollectionItemsAndRender();
+                }
+                if (this.searchEnabled) {
+                    this.service.fetchUsers(
+                        e.target.value,
+                        function(items) {
+                            this.items = items;
+                            this.setCollectionItemsAndRender();
+                        }.bind(this)
+                    );
+                }
+
                 break;
             }
         }
+    };
+
+    this.setCollectionItemsAndRender = function() {
+        this.collection.setItems(this.items);
+        this.collection.render();
     };
 
     this.filterItemsBySelected = function() {
