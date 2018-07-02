@@ -153,12 +153,34 @@ function VkDropdown(options) {
 }
 
 function VkDropdownService() {
-    this.search = function(searchString, items) {
+    BaseService.call(this);
+    var LanguageType = getLanguageTypes();
+    this.languageHelper = new LanguageHelper();
+
+    this.fetchUsers = function(searchString, onFetch) {
+        this.get("users?search=" + searchString, onFetch);
+    };
+
+    this.search = function(searchString, items, onFetch) {
         items = items || [];
         if (!items.length) return items;
-        return items.filter(function(item) {
-            return item.name.toLowerCase().indexOf(searchString.toLowerCase()) != -1;
-        });
+
+        return items.filter(
+            function(item) {
+                var name = item.name.toLowerCase();
+                var enToRuKeyboard = this.languageHelper.transform("en", "ru", LanguageType.KEYBOARD, searchString);
+                var ruToEnKeyboard = this.languageHelper.transform("ru", "en", LanguageType.KEYBOARD, searchString);
+                var enToRuPronounce = this.languageHelper.transform("en", "ru", LanguageType.PRONOUNCE, searchString);
+                var ruToEnPronounce = this.languageHelper.transform("ru", "en", LanguageType.PRONOUNCE, searchString);
+                return (
+                    name.indexOf(enToRuKeyboard) != -1 ||
+                    name.indexOf(ruToEnKeyboard) != -1 ||
+                    name.indexOf(enToRuPronounce) != -1 ||
+                    name.indexOf(ruToEnPronounce) != -1 ||
+                    name.indexOf(searchString.toLowerCase()) != -1
+                );
+            }.bind(this)
+        );
     };
 }
 
@@ -221,6 +243,14 @@ function getKeyCodes() {
     return codes;
 }
 
+function getSettings() {
+    var settings = {};
+
+    Object.defineProperty(settings, "serverUrl", { value: "http://localhost:8000/api/", writable: false });
+
+    return settings;
+}
+
 function VkInput(parent, options) {
     VkChildElement.call(this, parent);
     var DropdownMode = getDropdownModes();
@@ -279,6 +309,22 @@ function VkInput(parent, options) {
 
 function VkBaseElement() {
     this.helper = new VkElementHelper();
+}
+
+function BaseService() {
+    var settings = getSettings();
+    var proceedRequest = function(url, type, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(type, settings.serverUrl + url, true);
+        xhr.onreadystatechange = function() {
+            callback(JSON.parse(xhr.responseText));
+        };
+        xhr.send();
+    };
+
+    this.get = function(url, callback) {
+        proceedRequest(url, "GET", callback);
+    };
 }
 
 function VkChildElement(parent) {
@@ -470,6 +516,129 @@ function VkTagsCollection(parent, items, options) {
     this.createElement = function() {
         this.element = document.createElement("DIV");
         this.element.classList.add("vk-tags-collection");
+    };
+}
+
+function getLanguageTypes() {
+    var types = {};
+
+    Object.defineProperty(types, "KEYBOARD", { value: 1, writable: false });
+    Object.defineProperty(types, "PRONOUNCE", { value: 2, writable: false });
+
+    return types;
+}
+
+function getEngToRusPronounce() {
+    return {
+        a: "а",
+        b: "б",
+        c: "с",
+        d: "д",
+        e: "е",
+        f: "ф",
+        g: "г",
+        h: "х",
+        i: "и",
+        j: "дж",
+        k: "к",
+        l: "л",
+        m: "м",
+        n: "н",
+        o: "о",
+        p: "п",
+        q: "",
+        r: "р",
+        s: "с",
+        t: "т",
+        u: "у",
+        v: "в",
+        w: "в",
+        x: "кс",
+        y: "у",
+        z: "з"
+    };
+}
+
+function getEngToRusKeyboard() {
+    return {
+        q: "й",
+        w: "ц",
+        e: "у",
+        r: "к",
+        t: "е",
+        y: "н",
+        u: "г",
+        i: "ш",
+        o: "щ",
+        p: "з",
+        "[": "х",
+        "]": "ъ",
+        a: "ф",
+        s: "ы",
+        d: "в",
+        f: "а",
+        g: "п",
+        h: "р",
+        j: "о",
+        k: "л",
+        l: "д",
+        ";": "ж",
+        "'": "э",
+        z: "я",
+        x: "ч",
+        c: "с",
+        v: "м",
+        b: "и",
+        n: "т",
+        m: "ь",
+        ",": "б",
+        ".": "ю",
+        "`": "ё"
+    };
+}
+
+function LanguageHelper() {
+    var LanguageType = getLanguageTypes();
+
+    this.transform = function(langFrom, langTo, type, str) {
+        var currentDictionaryType = {};
+        var result = "";
+        if (type === LanguageType.KEYBOARD) currentDictionaryType = this.dictionary.keyboard;
+        if (type === LanguageType.PRONOUNCE) currentDictionaryType = this.dictionary.pronounce;
+
+        var tran = currentDictionaryType.filter(function(tran) {
+            return tran.from === langFrom && tran.to === langTo;
+        })[0];
+
+        if (!tran) return result;
+
+        for (var i = 0; i < str.length; i++) {
+            var char = tran.dictionary[str.charAt(i)];
+            if (!char) return null;
+            result += char;
+        }
+        return result;
+    };
+
+    this.getReversedMapping = function(dictionary) {
+        var reversedObject = {};
+        for (var key in dictionary) {
+            if (dictionary.hasOwnProperty(key)) {
+                reversedObject[dictionary[key]] = key;
+            }
+        }
+        return reversedObject;
+    };
+
+    this.dictionary = {
+        keyboard: [
+            { from: "en", to: "ru", dictionary: getEngToRusKeyboard() },
+            { from: "ru", to: "en", dictionary: this.getReversedMapping(getEngToRusKeyboard()) }
+        ],
+        pronounce: [
+            { from: "en", to: "ru", dictionary: getEngToRusPronounce() },
+            { from: "ru", to: "en", dictionary: this.getReversedMapping(getEngToRusPronounce()) }
+        ]
     };
 }
 
