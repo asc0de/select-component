@@ -9,12 +9,14 @@ function VkDropdown(options) {
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
     this.filterEnabled = options.filter || false;
+    this.searchEnabled = options.search || false;
     this.avatarEnabled = options.avatar || false;
     this.dataProp = options.dataProp || "id";
     this.labelProp = options.labelProp || "name";
     this.notFoundLabel = options.notFoundLabel || "Результатов не найдено";
     this.service = new VkDropdownService();
     this.selectedItems = [];
+    this.initItems = options.items;
     this.items = options.items;
 
     this.getValue = function() {
@@ -105,7 +107,8 @@ function VkDropdown(options) {
                 break;
             }
             default: {
-                this.items = this.service.search(e.target.value, this.items);
+                this.items = this.initItems;
+                if (this.filterEnabled) this.items = this.service.search(e.target.value, this.items);
                 this.collection.setItems(this.items);
                 this.collection.render();
                 break;
@@ -146,7 +149,7 @@ function VkDropdown(options) {
         this.element.classList.add("vk-dropdown");
         this.input.appendDom();
         var debouncedInputKeyUp = this.helper.debounce(onInputKeyUp.bind(this));
-        if (this.filterEnabled) {
+        if (this.filterEnabled || this.searchEnabled) {
             this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
         } else {
             this.input.disable();
