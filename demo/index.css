@@ -26,7 +26,7 @@ body .dropdowns-area .dropdowns-area__demo-container {
 }
 
 .dropdowns-area__demo-container__label {
-    font-family: Roboto;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-weight: 400;
     font-size: 1.5em;
     margin: 0.5em 0;

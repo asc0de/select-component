@@ -3,6 +3,7 @@ function VkCollection(parent, options) {
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
     this.avatarEnabled = options.avatarEnabled || false;
     this.dataProp = options.dataProp || "id";
+    this.notFoundLabel = options.notFoundLabel || "Результатов не найдено";
     this.onSelect = options.onSelect;
     this.items = [];
 
@@ -16,15 +17,22 @@ function VkCollection(parent, options) {
 
     this.render = function() {
         this.clearElement();
-        this.items.forEach(
-            function(item) {
-                var itemElement = new VkCollectionItem(this.element, item, {
-                    avatarEnabled: this.avatarEnabled,
-                    onSelect: this.onSelect.bind(this)
-                });
-                itemElement.appendDom(item);
-            }.bind(this)
-        );
+        if (this.items.length) {
+            this.items.forEach(
+                function(item) {
+                    var itemElement = new VkCollectionItem(this.element, item, {
+                        avatarEnabled: this.avatarEnabled,
+                        onSelect: this.onSelect.bind(this)
+                    });
+                    itemElement.appendDom(item);
+                }.bind(this)
+            );
+        } else {
+            var notFoundContainer = document.createElement("DIV");
+            notFoundContainer.innerText = this.notFoundLabel;
+            notFoundContainer.classList.add("vk-dropdown-collection--not-found");
+            this.element.appendChild(notFoundContainer);
+        }
     };
 
     this.createElement = function() {

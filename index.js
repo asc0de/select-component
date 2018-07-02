@@ -13,6 +13,14 @@ new VkDropdown({
     element: document.getElementById("dropdown4"),
     placeholder: "Введите имя",
     avatar: true,
+    filter: true,
+    mode: DropdownMode.MULTI_SELECT,
+    items: items
+});
+new VkDropdown({
+    element: document.getElementById("dropdown5"),
+    placeholder: "Введите имя",
+    avatar: true,
     search: true,
     mode: DropdownMode.MULTI_SELECT,
     items: items

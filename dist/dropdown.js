@@ -8,10 +8,11 @@ function VkDropdown(options) {
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
-    this.searchEnabled = options.search || false;
+    this.filterEnabled = options.filter || false;
     this.avatarEnabled = options.avatar || false;
     this.dataProp = options.dataProp || "id";
     this.labelProp = options.labelProp || "name";
+    this.notFoundLabel = options.notFoundLabel || "Результатов не найдено";
     this.service = new VkDropdownService();
     this.selectedItems = [];
     this.items = options.items;
@@ -35,10 +36,10 @@ function VkDropdown(options) {
         var item = filteredItems[0];
         item.collectionIndex = this.items.indexOf(item);
         this.selectedItems.push(item);
+        this.filterItemsBySelected();
         if (this.mode === DropdownMode.SINGLE_SELECT) {
             this.detachEvents();
         } else {
-            this.filterItemsBySelected();
             this.collection.render();
         }
         this.input.setSelectedItems(this.selectedItems);
@@ -79,7 +80,8 @@ function VkDropdown(options) {
         mode: this.mode,
         avatarEnabled: this.avatarEnabled,
         onSelect: this.onSelect.bind(this),
-        getWidth: this.input.getWidth.bind(this.input)
+        getWidth: this.input.getWidth.bind(this.input),
+        notFoundLabel: this.notFoundLabel
     });
 
     var onInputClick = function(e) {
@@ -144,7 +146,7 @@ function VkDropdown(options) {
         this.element.classList.add("vk-dropdown");
         this.input.appendDom();
         var debouncedInputKeyUp = this.helper.debounce(onInputKeyUp.bind(this));
-        if (this.searchEnabled) {
+        if (this.filterEnabled) {
             this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
         } else {
             this.input.disable();
@@ -196,6 +198,51 @@ function VkDropdownService() {
     };
 }
 
+function VkCollection(parent, options) {
+    VkChildElement.call(this, parent);
+    this.mode = options.mode || DropdownMode.SINGLE_SELECT;
+    this.avatarEnabled = options.avatarEnabled || false;
+    this.dataProp = options.dataProp || "id";
+    this.notFoundLabel = options.notFoundLabel || "Результатов не найдено";
+    this.onSelect = options.onSelect;
+    this.items = [];
+
+    this.setItems = function(items) {
+        this.items = items || [];
+    };
+    this.onSelect = function(id) {
+        options.onSelect(id);
+        this.hide();
+    };
+
+    this.render = function() {
+        this.clearElement();
+        if (this.items.length) {
+            this.items.forEach(
+                function(item) {
+                    var itemElement = new VkCollectionItem(this.element, item, {
+                        avatarEnabled: this.avatarEnabled,
+                        onSelect: this.onSelect.bind(this)
+                    });
+                    itemElement.appendDom(item);
+                }.bind(this)
+            );
+        } else {
+            var notFoundContainer = document.createElement("DIV");
+            notFoundContainer.innerText = this.notFoundLabel;
+            notFoundContainer.classList.add("vk-dropdown-collection--not-found");
+            this.element.appendChild(notFoundContainer);
+        }
+    };
+
+    this.createElement = function() {
+        this.element = document.createElement("DIV");
+        this.element.classList.add("vk-dropdown-collection");
+        if (options.getWidth) this.element.style.width = (options.getWidth() || 200) + "px";
+        this.render();
+    };
+}
+
 function getDropdownModes() {
     var modes = {};
 
@@ -224,43 +271,6 @@ function getSettings() {
     Object.defineProperty(settings, "serverUrl", { value: "http://localhost:8000/api/", writable: false });
 
     return settings;
-}
-
-function VkCollection(parent, options) {
-    VkChildElement.call(this, parent);
-    this.mode = options.mode || DropdownMode.SINGLE_SELECT;
-    this.avatarEnabled = options.avatarEnabled || false;
-    this.dataProp = options.dataProp || "id";
-    this.onSelect = options.onSelect;
-    this.items = [];
-
-    this.setItems = function(items) {
-        this.items = items || [];
-    };
-    this.onSelect = function(id) {
-        options.onSelect(id);
-        this.hide();
-    };
-
-    this.render = function() {
-        this.clearElement();
-        this.items.forEach(
-            function(item) {
-                var itemElement = new VkCollectionItem(this.element, item, {
-                    avatarEnabled: this.avatarEnabled,
-                    onSelect: this.onSelect.bind(this)
-                });
-                itemElement.appendDom(item);
-            }.bind(this)
-        );
-    };
-
-    this.createElement = function() {
-        this.element = document.createElement("DIV");
-        this.element.classList.add("vk-dropdown-collection");
-        if (options.getWidth) this.element.style.width = (options.getWidth() || 200) + "px";
-        this.render();
-    };
 }
 
 function VkInput(parent, options) {
@@ -689,6 +699,14 @@ new VkDropdown({
 });
 new VkDropdown({
     element: document.getElementById("dropdown4"),
+    placeholder: "Введите имя",
+    avatar: true,
+    filter: true,
+    mode: DropdownMode.MULTI_SELECT,
+    items: items
+});
+new VkDropdown({
+    element: document.getElementById("dropdown5"),
     placeholder: "Введите имя",
     avatar: true,
     search: true,

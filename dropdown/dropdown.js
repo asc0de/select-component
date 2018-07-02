@@ -7,10 +7,11 @@ function VkDropdown(options) {
 
     //properties
     this.mode = options.mode || DropdownMode.SINGLE_SELECT;
-    this.searchEnabled = options.search || false;
+    this.filterEnabled = options.filter || false;
     this.avatarEnabled = options.avatar || false;
     this.dataProp = options.dataProp || "id";
     this.labelProp = options.labelProp || "name";
+    this.notFoundLabel = options.notFoundLabel || "Результатов не найдено";
     this.service = new VkDropdownService();
     this.selectedItems = [];
     this.items = options.items;
@@ -34,10 +35,10 @@ function VkDropdown(options) {
         var item = filteredItems[0];
         item.collectionIndex = this.items.indexOf(item);
         this.selectedItems.push(item);
+        this.filterItemsBySelected();
         if (this.mode === DropdownMode.SINGLE_SELECT) {
             this.detachEvents();
         } else {
-            this.filterItemsBySelected();
             this.collection.render();
         }
         this.input.setSelectedItems(this.selectedItems);
@@ -78,7 +79,8 @@ function VkDropdown(options) {
         mode: this.mode,
         avatarEnabled: this.avatarEnabled,
         onSelect: this.onSelect.bind(this),
-        getWidth: this.input.getWidth.bind(this.input)
+        getWidth: this.input.getWidth.bind(this.input),
+        notFoundLabel: this.notFoundLabel
     });
 
     var onInputClick = function(e) {
@@ -143,7 +145,7 @@ function VkDropdown(options) {
         this.element.classList.add("vk-dropdown");
         this.input.appendDom();
         var debouncedInputKeyUp = this.helper.debounce(onInputKeyUp.bind(this));
-        if (this.searchEnabled) {
+        if (this.filterEnabled) {
             this.input.addEvent("keyup", debouncedInputKeyUp, 300, this);
         } else {
             this.input.disable();
