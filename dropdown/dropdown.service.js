@@ -14,17 +14,26 @@ function VkDropdownService() {
         return items.filter(
             function(item) {
                 var name = item.name.toLowerCase();
-                var enToRuKeyboard = this.languageHelper.transform("en", "ru", LanguageType.KEYBOARD, searchString);
+                var conditionStrings = [];
                 var ruToEnKeyboard = this.languageHelper.transform("ru", "en", LanguageType.KEYBOARD, searchString);
+                var enToRuKeyboard = this.languageHelper.transform("en", "ru", LanguageType.KEYBOARD, searchString);
                 var enToRuPronounce = this.languageHelper.transform("en", "ru", LanguageType.PRONOUNCE, searchString);
                 var ruToEnPronounce = this.languageHelper.transform("ru", "en", LanguageType.PRONOUNCE, searchString);
-                return (
-                    name.indexOf(enToRuKeyboard) != -1 ||
-                    name.indexOf(ruToEnKeyboard) != -1 ||
-                    name.indexOf(enToRuPronounce) != -1 ||
-                    name.indexOf(ruToEnPronounce) != -1 ||
-                    name.indexOf(searchString.toLowerCase()) != -1
-                );
+                if (ruToEnKeyboard !== null) {
+                    conditionStrings.push(ruToEnKeyboard);
+                    conditionStrings.push(this.languageHelper.transform("en", "ru", LanguageType.PRONOUNCE, ruToEnKeyboard));
+                }
+                if (enToRuKeyboard !== null) conditionStrings.push(enToRuKeyboard);
+                if (enToRuPronounce !== null) conditionStrings.push(enToRuPronounce);
+                if (ruToEnPronounce !== null) conditionStrings.push(ruToEnPronounce);
+                conditionStrings.push(searchString);
+
+                return conditionStrings.reduce(function(result, conditionString) {
+                    if (conditionString !== null) {
+                        result = result || name.indexOf(conditionString) != -1;
+                    }
+                    return result;
+                }, false);
             }.bind(this)
         );
     };
