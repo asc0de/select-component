@@ -136,11 +136,13 @@ function VkDropdown(options) {
     this.attachEvents = function() {
         this.input.addEvent("blur", onInputBlur.bind(this), true);
         this.input.addEvent("click", onInputClick.bind(this), true);
+        this.input.addEvent("focus", onInputClick.bind(this), true);
     };
 
     this.detachEvents = function() {
         this.input.removeEvent("blur");
         this.input.removeEvent("click");
+        this.input.removeEvent("focus");
     };
 
     this.appendDom = function() {
