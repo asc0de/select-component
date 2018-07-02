@@ -87,8 +87,13 @@ function VkDropdown(options) {
     });
 
     var onInputClick = function(e) {
+        if (this.filterEnabled) {
+            this.items = this.initItems;
+            this.filterItemsBySelected();
+        }
         this.collection.setItems(this.items);
         this.collection.appendDom();
+        this.collection.render();
     };
 
     var onInputBlur = function(e) {
