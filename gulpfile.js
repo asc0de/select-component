@@ -4,6 +4,8 @@ var concat = require("gulp-concat");
 var del = require("del");
 var insert = require("gulp-insert");
 var connect = require("gulp-connect");
+var uglify = require("gulp-uglify");
+let cleanCSS = require("gulp-clean-css");
 var ghpages = require("gh-pages");
 var distFolder = "dist";
 
@@ -30,6 +32,7 @@ gulp.task("js", function() {
                 return ";(function () {\r\n" + contents + "\r\n})();";
             })
         )
+        .pipe(uglify())
         .pipe(flatten())
         .pipe(gulp.dest(distFolder))
         .pipe(connect.reload());
@@ -47,6 +50,7 @@ gulp.task("css", function() {
     return gulp
         .src(["./dropdown/**/*.css"])
         .pipe(concat("dropdown.css"))
+        .pipe(cleanCSS())
         .pipe(gulp.dest(distFolder))
         .pipe(connect.reload());
 });
