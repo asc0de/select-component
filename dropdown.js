@@ -87,8 +87,12 @@ function VkDropdown(options) {
     });
 
     var onInputClick = function(e) {
-        this.collection.setItems(this.items);
+        if (this.filterEnabled) {
+            this.items = this.initItems;
+            this.filterItemsBySelected();
+        }
         this.collection.appendDom();
+        this.setCollectionItemsAndRender();
     };
 
     var onInputBlur = function(e) {
@@ -102,18 +106,34 @@ function VkDropdown(options) {
             case KeyCode.ARROW_TOP:
             case KeyCode.ARROW_RIGHT:
             case KeyCode.ARROW_DOWN:
-            case KeyCode.ALT:
-            case KeyCode.SHIFT: {
+            case KeyCode.ALT: {
                 break;
             }
             default: {
                 this.items = this.initItems;
-                if (this.filterEnabled) this.items = this.service.search(e.target.value, this.items);
-                this.collection.setItems(this.items);
-                this.collection.render();
+                if (this.filterEnabled) {
+                    this.items = this.service.search(e.target.value, this.items);
+                    this.filterItemsBySelected();
+                    this.setCollectionItemsAndRender();
+                }
+                if (this.searchEnabled) {
+                    this.service.fetchUsers(
+                        e.target.value,
+                        function(items) {
+                            this.items = items;
+                            this.setCollectionItemsAndRender();
+                        }.bind(this)
+                    );
+                }
+
                 break;
             }
         }
+    };
+
+    this.setCollectionItemsAndRender = function() {
+        this.collection.setItems(this.items);
+        this.collection.render();
     };
 
     this.filterItemsBySelected = function() {
@@ -137,11 +157,13 @@ function VkDropdown(options) {
     this.attachEvents = function() {
         this.input.addEvent("blur", onInputBlur.bind(this), true);
         this.input.addEvent("click", onInputClick.bind(this), true);
+        this.input.addEvent("focus", onInputClick.bind(this), true);
     };
 
     this.detachEvents = function() {
         this.input.removeEvent("blur");
         this.input.removeEvent("click");
+        this.input.removeEvent("focus");
     };
 
     this.appendDom = function() {
@@ -341,8 +363,8 @@ function BaseService() {
     var proceedRequest = function(url, type, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open(type, settings.serverUrl + url, true);
-        xhr.onreadystatechange = function() {
-            callback(JSON.parse(xhr.responseText));
+        xhr.onload = function() {
+            callback(JSON.parse(xhr.responseText || {}));
         };
         xhr.send();
     };
