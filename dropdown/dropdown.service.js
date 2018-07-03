@@ -9,6 +9,7 @@ function VkDropdownService() {
 
     this.search = function(searchString, items, onFetch) {
         items = items || [];
+        searchString = searchString.toLowerCase();
         if (!items.length) return items;
 
         return items.filter(
